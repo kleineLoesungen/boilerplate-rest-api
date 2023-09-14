@@ -3,12 +3,13 @@
 - Modern modulare architecture
 - API with CRUD functions
 - Optimized Docker image
+- Database connection with ORM (TypeORM/DataMapper, PostgreSQL, Adminer)
 
 ## Planned Features
-- Database connection with ORM (TypeORM, PostgreSQL)
 - Type check (Joi)
 - Auth: User/Passwort with secured Cookies (passport)
 - JWT (passport)
+- Database Relations: user <> node
 - Run on Kubernetes (k3s)
 - SSL/TLS over Kubernetes (k3s)
 - Scalable with caching (Redis)
