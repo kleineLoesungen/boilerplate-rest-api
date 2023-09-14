@@ -1,48 +1,49 @@
+import { AppDataSource } from '../database/data-source';
 import { Node } from '../models/nodeModel';
 import { v4 as uuidv4 } from 'uuid';
 
+const nodeRepository = AppDataSource.getRepository(Node)
+
 export interface NodeService {
-    createNode(node: Node): Node;
-    getNodeById(id: string): Node | undefined;
-    getAllNodes(): Node[];
-    updateNode(node: Node): Node | undefined;
-    deleteNodeById(id: string): boolean;
+    createNode(node: Node): Promise<Node>;
+    getNodeById(id: string): Promise<Node | null>;
+    getAllNodes(): Promise<Node[]>;
+    updateNode(node: Node): Promise<Node | null>;
+    deleteNodeById(id: string): Promise<boolean>;
 }
 
 export class NodeServiceImplementation implements NodeService {
-    private nodes: Node[] = [];
-
-    createNode(node: Node): Node {
+    async createNode(node: Node): Promise<Node> {
         node.id = uuidv4();
-        this.nodes.push(node);
+        const newNode = new Node(node.id, node.name, node.attributes)
+        await nodeRepository.save(newNode)
         return node;
     }
 
-    getNodeById(id: string): Node | undefined {
-        return this.nodes.find(node => node.id === id);
+    async getNodeById(nodeId: string): Promise<Node | null> {
+        return await nodeRepository.findOneBy({ id: nodeId });
     }
 
-    getAllNodes(): Node[] {
-        return this.nodes;
+    async getAllNodes(): Promise<Node[]> {
+        return await nodeRepository.find()
     }
 
-    updateNode(node: Node): Node | undefined {
-        const indexNode = this.nodes.findIndex(n => n.id === node.id);
-        if (indexNode > -1) {
-            this.nodes[indexNode] = node;
-            return this.nodes[indexNode];
-        } else {
-            return undefined;
-        }
+    async updateNode(node: Node): Promise<Node | null> {
+        const updateNode = await nodeRepository.findOneBy({ id: node.id })
+        if(updateNode === null) return null
+        
+        updateNode.name = node.name
+        updateNode.attributes = node.attributes
+        await nodeRepository.save(updateNode)
+
+        return node
     }
 
-    deleteNodeById(id: string): boolean {
-        const nodeIndex = this.nodes.findIndex(node => node.id === id);
-        if(nodeIndex !== -1) {
-            this.nodes.splice(nodeIndex, 1);
-            return true;
-        } else {
-            return false;
-        }
+    async deleteNodeById(nodeId: string): Promise<boolean> {
+        const updateNode = await nodeRepository.findOneBy({ id: nodeId })
+        if(updateNode === null) return false
+
+        await nodeRepository.remove(updateNode)
+        return true
     }
 }

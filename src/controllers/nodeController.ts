@@ -8,23 +8,35 @@ export class NodeController {
 
     createNode(req: Request, res: Response): void {
         const node = req.body;
-        const createdNode = this.nodeService.createNode(node);
-        res.json(createdNode);
+        this.nodeService.createNode(node)
+            .then((createdNode) => {
+                res.json(createdNode)
+            })
+            .catch((err) => {
+                res.status(404).json({ message: `Error during Node creation: ${err}`})
+            });
     }
 
     getNode(req: Request, res: Response): void {
         const nodeId = req.params.id;
-        const node = this.nodeService.getNodeById(nodeId);
-
-        if (node) {
-            res.json(node);
-        } else {
-            res.status(404).json({ message: 'Node not found' });
-        }
+        this.nodeService.getNodeById(nodeId)
+            .then((node) => {
+                if(node === null) res.status(404).json({ message: 'Node not found' })
+                res.json(node)
+            })
+            .catch((err) => {
+                res.status(404).json({ message: `Error during Node query: ${err}`})
+            });
     }
 
     getNodes(req: Request, res: Response): void {
-        res.json(this.nodeService.getAllNodes());
+        this.nodeService.getAllNodes()
+            .then((nodes) => {
+                res.json(nodes)
+            })
+            .catch((err) => {
+                res.status(404).json({ message: `Error during Nodes query: ${err}`})
+            });
     }
 
     updateNode(req: Request, res: Response): void {
@@ -33,23 +45,26 @@ export class NodeController {
             res.status(404).json({ message: 'Invalid values' });
             return;
         }
-        const updatedNode = this.nodeService.updateNode(node);
 
-        if(updatedNode) {
-            res.json(updatedNode);
-        } else {
-            res.status(404).json({ message: 'Node not found' });
-        }
+        this.nodeService.updateNode(node)
+            .then((updatedNode) => {
+                if(updatedNode === null) res.status(404).json({ message: 'Node not found' })
+                res.json(updatedNode)
+            })
+            .catch((err) => {
+                res.status(404).json({ message: `Error during Node update: ${err}`})
+            });
     }
 
     deleteNode(req: Request, res: Response): void {
         const nodeId = req.params.id;
-        const deletedNode = this.nodeService.deleteNodeById(nodeId)
-
-        if(deletedNode) {
-            res.json(true);
-        } else {
-            res.status(404).json({ message: 'Node not found' });
-        }
+        this.nodeService.deleteNodeById(nodeId)
+            .then((deletedNode) => {
+                if(deletedNode === null) res.status(404).json({ message: 'Node not found' })
+                res.json(true)
+            })
+            .catch((err) => {
+                res.status(404).json({ message: `Error during Node deletion: ${err}`})
+            });
     }
 }

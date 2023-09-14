@@ -6,7 +6,8 @@
   "scripts": {
     "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.ts"
+    "start": "docker compose -f run/compose.yaml up -d",
+    "build": "docker rmi -f web-node && docker build . -t web-node"
   },
   "repository": {
     "type": "git",
@@ -19,15 +20,18 @@
   },
   "homepage": "https://github.com/kleineLoesungen/boilerplate-rest-api#readme",
   "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.3.17",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
     "@types/body-parser": "^1.19.2",
     "@types/express": "^4.17.17",
     "@types/node": "^20.6.0",
     "@types/uuid": "^9.0.3",
-    "body-parser": "^1.20.2",
-    "express": "^4.18.2",
-    "uuid": "^9.0.0"
-  },
-  "devDependencies": {
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"

@@ -1,0 +1,29 @@
+services:
+  app:
+    image: web-node
+    ports:
+      - 8080:3000
+    environment:
+      POSTGRES_HOSTNAME: database
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: boilerplate
+      POSTGRES_DB: webnode
+
+  database:
+    image: postgres:15.4-alpine3.18
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: boilerplate
+      POSTGRES_DB: webnode
+      
+  adminer:
+    image: adminer
+    ports:
+      - 8900:8080
+
+volumes:
+  postgres-data:
