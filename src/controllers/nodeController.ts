@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { NodeService } from '../services/nodeService';
+import { v4 as uuidv4 } from 'uuid';
 
 export class NodeController {
     constructor(
@@ -8,6 +9,8 @@ export class NodeController {
 
     createNode(req: Request, res: Response): void {
         const node = req.body;
+        node.id = uuidv4()
+        
         this.nodeService.createNode(node)
             .then((createdNode) => {
                 res.json(createdNode)

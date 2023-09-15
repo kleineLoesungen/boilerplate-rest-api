@@ -1,19 +1,22 @@
-import { Entity, PrimaryColumn, Column, BaseEntity } from "typeorm"
+import { Entity, PrimaryColumn, Column } from "typeorm"
+import { JoiSchema, getClassSchema } from 'joi-class-decorators';
+import * as Joi from 'joi';
 
 @Entity()
 export class Node {
-    constructor(id: string, name: string, attributes: {[key: string]: string}[]) {
-        this.id = id
-        this.name = name
-        this.attributes = attributes
-    }
-    
     @PrimaryColumn("uuid")
-    id: string
+    @JoiSchema(Joi.string().uuid().required())
+    @JoiSchema(['CREATE'], Joi.string().uuid().optional())
+    public id!: string
     
     @Column("text")
-    name: string
+    @JoiSchema(Joi.string().required())
+    public name!: string
     
     @Column("jsonb")
-    attributes: {[key: string]: string}[]
+    @JoiSchema(Joi.array().min(0).required())
+    public attributes!: {[key: string]: string}[]
 }
+
+export const NodeJoiSchema = getClassSchema(Node);
+export const NodeJoiSchemaCreate = getClassSchema(Node, { group: 'CREATE' })

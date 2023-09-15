@@ -1,6 +1,5 @@
 import { AppDataSource } from '../database/data-source';
 import { Node } from '../models/nodeModel';
-import { v4 as uuidv4 } from 'uuid';
 
 const nodeRepository = AppDataSource.getRepository(Node)
 
@@ -14,8 +13,10 @@ export interface NodeService {
 
 export class NodeServiceImplementation implements NodeService {
     async createNode(node: Node): Promise<Node> {
-        node.id = uuidv4();
-        const newNode = new Node(node.id, node.name, node.attributes)
+        const newNode = new Node()
+        newNode.id = node.id
+        newNode.name = node.name
+        newNode.attributes = node.attributes
         await nodeRepository.save(newNode)
         return node;
     }
