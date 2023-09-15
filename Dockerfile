@@ -25,7 +25,7 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 # Remove unnecessary files from dependencies
-RUN npm prune --production
+RUN npm prune --omit=dev
 
 # EXPOSE 3000
 
