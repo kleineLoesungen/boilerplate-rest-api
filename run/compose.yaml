@@ -4,7 +4,7 @@ services:
     ports:
       - 8080:3000
     environment:
-      POSTGRES_HOSTNAME: database
+      POSTGRES_HOST: database
       POSTGRES_USER: app
       POSTGRES_PASSWORD: boilerplate
       POSTGRES_DB: webnode
