@@ -1,6 +1,6 @@
+import "reflect-metadata"
 import express from 'express'
 import bodyParser from 'body-parser'
-import "reflect-metadata"
 import { routesNode } from './src/routes/v1/nodeRoutes'
 import { AppDataSource } from './src/database/data-source';
 
@@ -22,10 +22,9 @@ app.use('/api/v1/nodes', routesNode);
 
 /**
  * NEXT
- * 2. Database (inclusive Docker Compose)
- * 3. Check Parm Types
  * 4. User/Password + Cookies
  * 5. JWT
+ * 5.5. Database Relations: User <> Nodes
  * 6. Run on k3s
  * 7. SSL/TLS on k3s
  * 8. Caching with Redis
