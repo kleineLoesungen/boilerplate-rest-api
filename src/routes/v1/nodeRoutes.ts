@@ -1,8 +1,8 @@
 import express from 'express'
 import container from '../../containers/container';
 import { NodeController } from '../../controllers/nodeController';
-import { joiValidateNode, joiValidateNodeCreate, joiValidateUuid } from '../../middleware/joiValidateNodeMiddleware';
-import { isLoggedIn } from '../../middleware/authMiddleware';
+import { joiValidateNode, joiValidateNodeCreate, joiValidateUuid } from '../../middlewares/joiValidateNodeMiddleware';
+import { isLoggedIn } from '../../middlewares/authMiddleware';
 
 const routesNode = express.Router();
 const nodeController = container.resolve<NodeController>('nodeController');

@@ -1,8 +1,8 @@
 import express from 'express'
 import container from '../../containers/container';
 import { UserController } from '../../controllers/userController';
-import { joiValidateIsAdmin, joiValidateParamsId, joiValidatePassword, joiValidateUser, joiValidateUserId } from '../../middleware/joiValidateAuthMiddleware';
-import { isAdmin, isLoggedIn } from '../../middleware/authMiddleware';
+import { joiValidateIsAdmin, joiValidateParamsId, joiValidatePassword, joiValidateUser, joiValidateUserId } from '../../middlewares/joiValidateAuthMiddleware';
+import { isAdmin, isLoggedIn } from '../../middlewares/authMiddleware';
 
 const routesAuth = express.Router();
 const userController = container.resolve<UserController>('userController');
