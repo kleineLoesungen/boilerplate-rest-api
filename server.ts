@@ -2,34 +2,25 @@ import "reflect-metadata"
 import express from 'express'
 import bodyParser from 'body-parser'
 import { routesNode } from './src/routes/v1/nodeRoutes'
-import { AppDataSource } from './src/database/data-source';
+import { routesAuth } from './src/routes/v1/authRoutes'
+import cookieSession from 'cookie-session'
 
 const app = express();
 const PORT = 3000;
 
 // Middleware
 app.use(bodyParser.json());
-AppDataSource.initialize()
-    .then(() => {
-        console.log("Data Source has been initialized!")
-    })
-    .catch((err) => {
-        console.error("Error during Data Source initialization", err)
-    })
+app.use(cookieSession({
+    name: 'auth-session',
+    secret: process.env.SESSION_SECRET,
+    secure: false, // in production must be true = https-requests only
+    httpOnly: true, // not accessable by client javascript (default)
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week
+  }))
 
 // Routes
 app.use('/api/v1/nodes', routesNode);
-
-/**
- * NEXT
- * 4. User/Password + Cookies
- * 5. JWT
- * 5.5. Database Relations: User <> Nodes
- * 6. Run on k3s
- * 7. SSL/TLS on k3s
- * 8. Caching with Redis
- * Optional: Support SSO?
- */
+app.use('/api/v1/auth', routesAuth);
 
 // Run
 app.listen(PORT, () => {

@@ -1,5 +1,7 @@
 import { NodeController } from '../controllers/nodeController';
+import { UserController } from '../controllers/userController';
 import { NodeService, NodeServiceImplementation } from '../services/nodeService';
+import { UserService, UserServiceImplementation } from '../services/userService';
 
 class Container {
     private instances: { [key: string]: any } = {};
@@ -14,7 +16,11 @@ class Container {
 }
 
 const container = new Container();
+
 container.register('nodeService', new NodeServiceImplementation());
 container.register('nodeController', new NodeController(container.resolve<NodeService>('nodeService')));
+
+container.register('userService', new UserServiceImplementation());
+container.register('userController', new UserController(container.resolve<UserService>('userService')));
 
 export default container;

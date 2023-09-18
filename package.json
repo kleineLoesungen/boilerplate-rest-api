@@ -7,7 +7,7 @@
     "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "docker compose -f run/compose.yaml up -d",
-    "build": "docker rmi -f web-node && docker build . -t web-node"
+    "build": "docker build . -t web-node"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/kleineLoesungen/boilerplate-rest-api#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
+    "cookie-session": "^2.0.0",
     "express": "^4.18.2",
     "joi": "^17.10.1",
     "joi-class-decorators": "^1.1.0",
@@ -30,7 +32,9 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/body-parser": "^1.19.2",
+    "@types/cookie-session": "^2.0.45",
     "@types/express": "^4.17.17",
     "@types/node": "^20.6.0",
     "@types/uuid": "^9.0.3",

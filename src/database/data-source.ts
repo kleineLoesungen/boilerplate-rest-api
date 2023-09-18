@@ -11,3 +11,11 @@ export const AppDataSource = new DataSource({
     logging: true,
     entities: ["./src/models/*.js"]
 })
+
+AppDataSource.initialize()
+    .then(() => {
+        console.log("Data Source has been initialized!")
+    })
+    .catch((err) => {
+        console.error("Error during Data Source initialization", err)
+    })
