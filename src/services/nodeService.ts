@@ -1,12 +1,12 @@
 import { AppDataSource } from '../database/data-source';
-import { Node } from '../models/nodeModel';
+import { Node, NodeInfo } from '../models/nodeModel';
 
 const nodeRepository = AppDataSource.getRepository(Node)
 
 export interface NodeService {
     createNode(node: Node): Promise<Node>;
     getNodeById(id: string): Promise<Node | null>;
-    getAllNodes(): Promise<Node[]>;
+    getAllNodes(): Promise<NodeInfo[]>;
     updateNode(node: Node): Promise<Node | null>;
     deleteNodeById(id: string): Promise<boolean>;
 }
@@ -25,8 +25,13 @@ export class NodeServiceImplementation implements NodeService {
         return await nodeRepository.findOneBy({ id: nodeId });
     }
 
-    async getAllNodes(): Promise<Node[]> {
-        return await nodeRepository.find()
+    async getAllNodes(): Promise<NodeInfo[]> {
+        return await nodeRepository.find({
+            select: {
+                id: true,
+                name: true,
+            }
+        })
     }
 
     async updateNode(node: Node): Promise<Node | null> {

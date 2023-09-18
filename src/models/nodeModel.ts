@@ -18,5 +18,10 @@ export class Node {
     public attributes!: {[key: string]: string}[]
 }
 
+export interface NodeInfo {
+    id: string,
+    name: string
+}
+
 export const NodeJoiSchema = getClassSchema(Node);
 export const NodeJoiSchemaCreate = getClassSchema(Node, { group: 'CREATE' })
