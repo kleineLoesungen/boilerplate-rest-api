@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 const userRepository = AppDataSource.getRepository(User)
 
 export interface UserService {
-    createUser(user: LoginUser): Promise<string>;
+    createUser(user: LoginUser): Promise<string | null>;
     getUserById(id: string): Promise<User | null>;
     getAllUsers(): Promise<{user: string, is_admin: boolean}[]>; 
     updateUserId(oldUser: string, newUser: string): Promise<string | null>;
@@ -15,7 +15,10 @@ export interface UserService {
 }
 
 export class UserServiceImplementation implements UserService {
-    async createUser(user: LoginUser): Promise<string> {
+    async createUser(user: LoginUser): Promise<string | null> {
+        const existingUser = await userRepository.findOneBy({ user: user.user })
+        if(existingUser !== null) return null
+
         const newUser = new User()
 
         const salt = bcrypt.genSaltSync(saltRounds)
