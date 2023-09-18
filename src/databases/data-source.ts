@@ -1,4 +1,6 @@
 import { DataSource } from "typeorm";
+import container from "../containers/container";
+import { UserService } from "../services/userService";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -15,7 +17,30 @@ export const AppDataSource = new DataSource({
 AppDataSource.initialize()
     .then(() => {
         console.log("Data Source has been initialized!")
+
+        setInitialDatabaseAdmin()
     })
     .catch((err) => {
         console.error("Error during Data Source initialization", err)
     })
+
+function setInitialDatabaseAdmin() {
+    const userService = container.resolve<UserService>('userService')
+
+    // is Admin set?
+    userService.getAllUsers()
+        .then((users) => {
+            if(users.filter(u => u.is_admin).length === 0) {
+                // create initial admin
+                const admin = userService.createUser({
+                    user: process.env.APP_ADMIN_USER!,
+                    password: process.env.APP_ADMIN_PASSWORD!,
+                    is_admin: true
+                })
+                if(admin === null) throw new Error('user id/name already exists')
+            }
+        })
+        .catch((err) => {
+            console.error("Error during Admin creation", err)
+        })
+}
