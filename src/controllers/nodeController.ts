@@ -24,7 +24,10 @@ export class NodeController {
         const nodeId = req.params.id;
         this.nodeService.getNodeById(nodeId)
             .then((node) => {
-                if(node === null) res.status(404).json({ message: 'Node not found' })
+                if(node === null) {
+                    res.status(404).json({ message: 'Node not found' })
+                    return
+                }
                 res.json(node)
             })
             .catch((err) => {
@@ -51,7 +54,10 @@ export class NodeController {
 
         this.nodeService.updateNode(node)
             .then((updatedNode) => {
-                if(updatedNode === null) res.status(404).json({ message: 'Node not found' })
+                if(updatedNode === null) {
+                    res.status(404).json({ message: 'Node not found' })
+                    return
+                }
                 res.json(updatedNode)
             })
             .catch((err) => {
@@ -63,7 +69,9 @@ export class NodeController {
         const nodeId = req.params.id;
         this.nodeService.deleteNodeById(nodeId)
             .then((deletedNode) => {
-                if(deletedNode === null) res.status(404).json({ message: 'Node not found' })
+                if(deletedNode === null) {
+                    res.status(404).json({ message: 'Node not found' })
+                }
                 res.json(true)
             })
             .catch((err) => {
