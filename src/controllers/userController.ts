@@ -13,6 +13,10 @@ export class UserController {
         
         this.userService.createUser(user)
             .then((createdUserName) => {
+                if(createdUserName === null)  {
+                    res.status(404).json({ message: 'User creation failed: user id already exists' })
+                    return
+                }
                 res.json(createdUserName)
             })
             .catch((err) => {
