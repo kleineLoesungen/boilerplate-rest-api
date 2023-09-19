@@ -1,4 +1,4 @@
-import { AppDataSource } from '../databases/data-source';
+import { AppDataSource } from '../databases/postgresDatabase';
 import { LoginUser, User, saltRounds } from '../models/userModel';
 import bcrypt from "bcrypt";
 

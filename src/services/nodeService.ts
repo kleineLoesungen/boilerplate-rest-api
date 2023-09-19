@@ -1,4 +1,4 @@
-import { AppDataSource } from '../databases/data-source';
+import { AppDataSource } from '../databases/postgresDatabase';
 import { Node, NodeInfo } from '../models/nodeModel';
 
 const nodeRepository = AppDataSource.getRepository(Node)
