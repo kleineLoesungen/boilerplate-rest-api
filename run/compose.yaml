@@ -3,30 +3,76 @@ services:
     image: web-node
     ports:
       - 8080:3000
+    networks:
+      - backend
+      - dbnet
     environment:
       POSTGRES_HOST: database
       POSTGRES_USER: app
       POSTGRES_PASSWORD: boilerplate
       POSTGRES_DB: webnode
       SESSION_SECRET: s9gJbLo3uV
+      REDIS_HOST: redis
+      REDIS_PASSWORD: 123
       APP_ADMIN_USER: Sebastian
       APP_ADMIN_PASSWORD: 123456
 
   database:
     image: postgres:15.4-alpine3.18
-    ports:
-      - 5432:5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: boilerplate
       POSTGRES_DB: webnode
+    networks:
+      - postgresnet
+      - dbnet
       
   adminer:
     image: adminer
     ports:
       - 8900:8080
+    depends_on:
+      - database
+    networks:
+      - postgresnet
+      - backend
+  
+  redis:
+    image: arm64v8/redis:7.2-alpine3.18
+    command: redis-server --requirepass "123"
+    volumes:
+      - redis:/var/lib/redis
+      - redis-config:/usr/local/etc/redis/redis.conf
+    networks:
+      - redisnet
+      - dbnet
+
+  redis-commander:
+    image: redis-commander
+    environment:
+      REDIS_HOSTS: web-node:redis:6379:0:123
+      HTTP_USER: app
+      HTTP_PASSWORD: boilerplate
+    ports:
+      - 8901:8081
+    depends_on:
+      - redis
+    networks:
+      - redisnet
+      - backend
+
+networks:
+  redisnet:
+    internal: true
+  postgresnet:
+    internal: true
+  dbnet:
+    internal: true
+  backend:
 
 volumes:
   postgres-data:
+  redis:
+  redis-config:
