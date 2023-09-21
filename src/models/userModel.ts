@@ -23,7 +23,7 @@ export class LoginUser {
     public user!: string
 
     @JoiSchema(Joi.string().required())
-    public password!: string
+    public password: string | undefined
 
     @JoiSchema(Joi.boolean().optional())
     public is_admin!: boolean
