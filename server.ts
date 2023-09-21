@@ -22,17 +22,6 @@ app.use(cookieSession({
 app.use('/api/v1/nodes', routesNode);
 app.use('/api/v1/auth', routesAuth);
 
-/**
- * NEXT
- * 5. JWT
- * 8. Caching with Redis 
- * 5.5. Database Relations: User <> Nodes
- * 5.7 SSL/TLS on docker compose
- * 6. Run on k3s
- * 7. SSL/TLS on k3s
- * Optional: Support SSO?
- */
-
 // Run
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
