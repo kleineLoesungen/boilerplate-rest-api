@@ -6,6 +6,7 @@
 - [Data stored in Database](#database)
 - [Typechecks of inputs](#middleware-type-check)
 - [Auth with user accounts](#auth-users)
+- Management of user sessions
 
 ## Use of Repository
 - Use docker compose in `/run`
@@ -17,6 +18,8 @@ all variables are required
 - `POSTGRES_USER`
 - `POSTGRES_PASSWORD`
 - `POSTGRES_DB` schema *public* is used
+- `REDIS_HOST`
+- `REDIS_PASSWORD`
 - `SESSION_SECRET`
 - `APP_ADMIN_USER` is used, if no admin exists
 - `APP_ADMIN_PASSWORD` is used, if no admin exists
@@ -40,9 +43,9 @@ More folders:
 - Validation checks over middleware in `/middlewares/JoiValidate*Middleware.ts`
 
 ### Database
-- Using [TypeORM](https://typeorm.io/)
+- Using [TypeORM](https://typeorm.io/) and [ioredis](https://www.npmjs.com/package/ioredis)
 - Table definitions are inside data classes in `/models`
-- Database connector definition is in `/databases` . Current set up with postgres database
+- Database connector definition is in `/databases` . Current set up with postgres database and redis caching
 
 ### CRUD Functions (without user accounts)
 in `/routes`, e.g.
@@ -53,11 +56,11 @@ in `/routes`, e.g.
 - `DELETE /api/v1/nodes/:id/delete` Delete Node (only for users)
 
 ### Auth Users
-- Using [Cookie-Session](https://github.com/expressjs/cookie-session#readme) and [BCrypt](https://github.com/kelektiv/node.bcrypt.js#readme)
+- Using [cookie-session](https://github.com/expressjs/cookie-session#readme) and [bcrypt](https://github.com/kelektiv/node.bcrypt.js#readme)
 - Session (http-only, age 1 week) is always set/checked over middleware in `server.ts`
-- Middleware in `middlewares/authMiddleware.ts` checks sessions values
+- Middleware in `middlewares/authMiddleware.ts` checks sessions values in caching 
 - Protected routes must implement **isLoggedIn** (only for users) or **isAdmin** (only for admins)
-- Database user table definition is in `/models/userModel.ts`
+- Database user table definition is in `/models/userModel.ts` and session values in `/models/sessionModel.ts`
 
 ### Dockerfile
 - Multi-Stage image creation
@@ -67,7 +70,6 @@ in `/routes`, e.g.
 
 ## Next for Boilerplate
 - Support authentification for apps (API Tokens)
-- Caching different user sessions (Redis)
 
 ## Next for Running Boilerplate
 ### Docker Compose
