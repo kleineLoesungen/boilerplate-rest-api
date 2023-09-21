@@ -6,9 +6,6 @@ import * as Joi from 'joi';
 export class User {
     @PrimaryColumn("text")
     public user!: string
-    
-    @Column("text")
-    public salt!: string
 
     @Column("text")
     public passhash!: string

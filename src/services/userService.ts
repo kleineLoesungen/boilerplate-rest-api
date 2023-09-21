@@ -26,7 +26,6 @@ export class UserServiceImplementation implements UserService {
 
         newUser.user = user.user
         newUser.is_admin = user.is_admin
-        newUser.salt = salt
         newUser.passhash = passhash
         await userRepository.save(newUser).catch((err) => {
             console.log('Error during user creation', err)
@@ -75,7 +74,6 @@ export class UserServiceImplementation implements UserService {
         const salt = bcrypt.genSaltSync(saltRounds)
         const passhash = bcrypt.hashSync(newPassword, salt)
 
-        updateUser.salt = salt
         updateUser.passhash = passhash
         await userRepository.save(updateUser)
         return updateUser.user;
