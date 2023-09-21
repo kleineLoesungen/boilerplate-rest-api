@@ -43,7 +43,7 @@ export class UserServiceImplementation implements UserService {
         return (await userRepository.find()).map(u => ({ user: u.user, is_admin: u.is_admin }))
     }
 
-    //TODO: Prüfe, ob new vorhanden
+    //TODO: Check if id exists
     async updateUserId(oldUserId: string, newUserId: string): Promise<string | null> {
         const updateUser = await userRepository.findOneBy({ user: oldUserId })
         if(updateUser === null) return null
@@ -58,7 +58,7 @@ export class UserServiceImplementation implements UserService {
         return newUser
     }
 
-    //TODO: Letzter Admin darf nicht geändert werden
+    //TODO: One admin must be left
     async updateUserRole(userId: string, isAdmin: boolean): Promise<boolean | null> {
         const updateUser = await userRepository.findOneBy({ user: userId })
         if(updateUser === null) return null

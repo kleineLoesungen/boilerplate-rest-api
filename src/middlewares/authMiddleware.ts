@@ -6,7 +6,6 @@ export async function isLoggedIn(req: Request, res: Response, next: any) {
     if(user === null) {
         res.sendStatus(401)
     } else {
-        //FIXME: user in Request speichern?
         next()
     }
 }
@@ -16,7 +15,6 @@ export async function isAdmin(req: Request, res: Response, next: any) {
     if(value === null || value === 'false') {
         res.sendStatus(401)
     } else {
-        //FIXME: role in Request speichern?
         next()
     }
 }
