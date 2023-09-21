@@ -13,6 +13,9 @@ export class UserController {
 
     async createUser(req: Request, res: Response): Promise<void> {
         const user: LoginUser = req.body
+        if(user.is_admin === undefined) {
+            user.is_admin = false
+        }
 
         const createdUserName = await this.userService.createUser(user)
         if(createdUserName === null) {
