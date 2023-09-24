@@ -1,68 +1,92 @@
 import { redisRepository } from "../databases/redisDatabase";
-import { DeviceSession } from "../models/sessionModel";
+import { ClientSession } from "../models/sessionModel";
 import { LoginUser } from "../models/userModel";
 import { v4 as uuidv4 } from 'uuid';
 
 export interface SessionService {
-    registerDeviceSession(user: LoginUser, deviceInfo: string | undefined): Promise<DeviceSession>;
-    revokeDeviceSessionById(sessionId: string): Promise<void>;
-    revokeDeviceSessionByDevice(userId: string, deviceId: string): Promise<void>;
-    getUserSessions(userId: string): Promise<DeviceSession[]>;
+    /**
+     * register client session in cache
+     */
+    registerClientSession(user: LoginUser, clientInfo: string | undefined): Promise<ClientSession>;
+
+    /**
+     * revoke client session in cache (by session id)
+     */
+    revokeClientSessionById(sessionId: string): Promise<void>;
+
+    /**
+     * revoke client session in cache (by client id)
+     */
+    revokeClientSessionByDevice(userId: string, clientId: string): Promise<void>;
+
+    /**
+     * get user client sessions from cache
+     */
+    getUserSessions(userId: string): Promise<ClientSession[]>;
+
+    /**
+     * update user client sessions in cache (user id changed)
+     */
     updateUserId(oldUserId: string, newUserId: string): Promise<void>;
+    
+    /**
+     * update user client sessions in cache (user role changed)
+     */
     updateUserRole(userId: string, isAdmin: boolean): Promise<void>;
+
+    /**
+     * revoke all user client session in cache
+     */
     revokeAllUserSessions(userId: string): Promise<void>;
 }
 
 export class SessionServiceImplementation implements SessionService {
-    async registerDeviceSession(user: LoginUser, deviceInfo: string | undefined): Promise<DeviceSession> {
-        const newSession = new DeviceSession()
+    async registerClientSession(user: LoginUser, clientInfo: string | undefined): Promise<ClientSession> {
+        const newSession = new ClientSession()
         newSession.id = uuidv4()
-        newSession.deviceId = uuidv4()
-        newSession.info = deviceInfo || 'unknown'
+        newSession.clientId = uuidv4()
+        newSession.info = clientInfo || 'unknown'
 
         await redisRepository.mset(
-            `sessions:${newSession.id}:user`, user.user,
+            `sessions:${newSession.id}:user`, user.id,
             `sessions:${newSession.id}:isadmin`, `${user.is_admin}`,
-            `sessions:${newSession.id}:deviceInfo`, newSession.info,
-            `sessions:${newSession.id}:deviceId`, newSession.deviceId
+            `sessions:${newSession.id}:clientInfo`, newSession.info,
+            `sessions:${newSession.id}:clientId`, newSession.clientId
         )
-        await redisRepository.sadd(`sessions:${user.user}`, newSession.id)
+        await redisRepository.sadd(`sessions:${user.id}`, newSession.id)
 
         return newSession
     }
 
-    async revokeDeviceSessionById(sessionId: string): Promise<void> {
+    async revokeClientSessionById(sessionId: string): Promise<void> {
         const user = await redisRepository.get(`sessions:${sessionId}:user`)
         if (user !== null) {
             await redisRepository.srem(`sessions:${user}`, sessionId)
-            await redisRepository.del(
-                `sessions:${sessionId}:user`,
-                `sessions:${sessionId}:isadmin`,
-                `sessions:${sessionId}:deviceInfo`,
-                `sessions:${sessionId}:deviceId`)
+            const sessionKeys = await redisRepository.keys(`sessions:${sessionId}:*`)
+            await redisRepository.del(sessionKeys)
         }
     }
 
-    async revokeDeviceSessionByDevice(userId: string, deviceId: string): Promise<void> {
+    async revokeClientSessionByDevice(userId: string, clientId: string): Promise<void> {
         const deviceSessionIds = await redisRepository.smembers(`sessions:${userId}`)
         for(const id of deviceSessionIds) {
-            const sessionDeviceId = await redisRepository.get(`sessions:${id}:deviceId`)
-            if(sessionDeviceId !== null && sessionDeviceId === deviceId) {
-                this.revokeDeviceSessionById(id)
+            const sessionDeviceId = await redisRepository.get(`sessions:${id}:clientId`)
+            if(sessionDeviceId !== null && sessionDeviceId === clientId) {
+                this.revokeClientSessionById(id)
             }
         }
     }
 
-    async getUserSessions(userId: string): Promise<DeviceSession[]> {
-        const userSessions: DeviceSession[] = []
+    async getUserSessions(userId: string): Promise<ClientSession[]> {
+        const userSessions: ClientSession[] = []
 
         const deviceSessionIds = await redisRepository.smembers(`sessions:${userId}`)
         for(const id of deviceSessionIds) {
-            const deviceId = await redisRepository.get(`sessions:${id}:deviceId`)
-            if(deviceId !== null) {
-                const session = new DeviceSession()
-                session.deviceId = deviceId
-                session.info = await redisRepository.get(`sessions:${id}:deviceInfo`) || 'unknown'
+            const clientId = await redisRepository.get(`sessions:${id}:clientId`) // session tokens ignored (no clientId)
+            if(clientId !== null) {
+                const session = new ClientSession()
+                session.clientId = clientId
+                session.info = await redisRepository.get(`sessions:${id}:clientInfo`) || 'unknown'
                 userSessions.push(session)
             }
         }
@@ -88,7 +112,7 @@ export class SessionServiceImplementation implements SessionService {
     async revokeAllUserSessions(userId: string): Promise<void> {
         const deviceSessionIds = await redisRepository.smembers(`sessions:${userId}`)
         for(const id of deviceSessionIds) {
-            await this.revokeDeviceSessionById(id)
+            await this.revokeClientSessionById(id)
         }
     }
 }

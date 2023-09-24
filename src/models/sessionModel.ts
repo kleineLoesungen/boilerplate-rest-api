@@ -1,9 +1,11 @@
-import { LoginUser, User } from "./userModel"
 
-export class DeviceSession {
+/**
+ * typescript definition of ClientSession. ClientSession is used for authentication with client cookie.
+ */
+export class ClientSession {
     public id: string | undefined
 
-    public deviceId!: string
+    public clientId!: string
 
     public info!: string
 }

@@ -2,6 +2,9 @@ import { Entity, PrimaryColumn, Column } from "typeorm"
 import { JoiSchema, getClassSchema } from 'joi-class-decorators';
 import * as Joi from 'joi';
 
+/**
+ * database, type check and typescript definition of Node. Node is used for example data.
+ */
 @Entity()
 export class Node {
     @PrimaryColumn("uuid")
@@ -18,6 +21,9 @@ export class Node {
     public attributes!: {[key: string]: string}[]
 }
 
+/**
+ * typescript interface definition of NodeInfo. NodeInfo is used for client requests.
+ */
 export interface NodeInfo {
     id: string,
     name: string

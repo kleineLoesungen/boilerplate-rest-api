@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { LoginUser, User } from '../models/userModel';
 import bcrypt from "bcrypt";
-import { redisRepository } from '../databases/redisDatabase';
 import { SessionService } from '../services/sessionService';
 
 export class UserController {
@@ -11,6 +10,9 @@ export class UserController {
         private sessionService: SessionService
     ) {}
 
+    /**
+     * create user. user id/name is unique
+     */
     async createUser(req: Request, res: Response): Promise<void> {
         const user: LoginUser = req.body
         if(user.is_admin === undefined) {
@@ -25,14 +27,20 @@ export class UserController {
         res.json(createdUserName)
     }
 
+    /**
+     * list all users with role
+     */
     async listUsers(req: Request, res: Response): Promise<void> {
         const users = await this.userService.getAllUsers()
         res.json(users)
     }
 
+    /**
+     * login user with credentials and update/set session informations
+     */
     async loginUser(req: Request, res: Response): Promise<void> {
         const user: LoginUser = req.body
-        const dbUser: void | User | null = await this.userService.getUserById(user.user)
+        const dbUser: void | User | null = await this.userService.getUserById(user.id)
 
         // no user
         if(dbUser === null || dbUser === undefined)  {
@@ -47,110 +55,100 @@ export class UserController {
             return
         } else {
             const sessionUser = new LoginUser()
-            sessionUser.user = user.user
+            sessionUser.id = user.id
             sessionUser.is_admin = dbUser.is_admin
-            const deviceInfo = req.header('User-Agent')
-            const deviceSession = await this.sessionService.registerDeviceSession(sessionUser, deviceInfo)
+            const clientInfo = req.header('User-Agent')
+            const deviceSession = await this.sessionService.registerClientSession(sessionUser, clientInfo)
 
             req.session!.sessionId = deviceSession.id
-            res.json(`logged in as ${user.user}`)
+            res.json(`logged in as ${user.id}`)
         }   
     }
 
+    /**
+     * logout user and update/remove session informations
+     */
     async logoutUser(req: Request, res: Response): Promise<void> {
         if(req.session!.sessionId !== undefined || req.session!.sessionId !== null) {
-            await this.sessionService.revokeDeviceSessionById(req.session!.sessionId)
+            await this.sessionService.revokeClientSessionById(req.session!.sessionId)
             delete req.session!.sessionId
         }
         res.json(`logged out`)
     }
 
-    async getUserSessions(req: Request, res: Response): Promise<void> {
-        const user = await redisRepository.get(`sessions:${req.session!.sessionId}:user`)
-
-        if(user === null) {
-            res.sendStatus(401)
-        } else {
-            const sessions = await this.sessionService.getUserSessions(user)
-            res.json(sessions)
-        }
-    }
-
+    /**
+     * update user name. user must be logged in.
+     */
     async updateUserName(req: Request, res: Response): Promise<void> {
-        const change = req.body
-        const user = await redisRepository.get(`sessions:${req.session!.sessionId}:user`)
-
-        if(user !== null && typeof change.user === 'string') {
-            const updatedUser = await this.userService.updateUserId(user, change.user)
-            if(updatedUser === null) {
-                res.status(404).json({ message: 'User update failed' })
-                return
-            }
-
-            this.sessionService.updateUserId(user, change.user)
-            res.json(true)
+        if(req.user?.id === undefined || req.body.user === undefined) {
+            res.sendStatus(400)
             return
         }
-        res.sendStatus(400)
+
+        const updatedUser = await this.userService.updateUserId(req.user.id, req.body.user)
+        if(updatedUser === null) {
+            res.status(404).json({ message: 'User update failed' })
+            return
+        }
+
+        this.sessionService.updateUserId(req.user.id, req.body.user)
+        res.json(true)
     }
 
+    /**
+     * update user password. user must be logged in.
+     */
     async updateUserPassword(req: Request, res: Response): Promise<void> {
-        const change = req.body
-        const user = await redisRepository.get(`sessions:${req.session!.sessionId}:user`)
-
-        if(user !== null && typeof change.password === 'string') {
-            const updatedUser = await this.userService.updateUserPassword(user, change.password)
-            if(updatedUser === null) {
-                res.status(404).json({ message: 'User update failed' })
-                return
-            }
-
-            res.json(true)
+        if(req.user?.id === undefined || req.body.password === undefined) {
+            res.sendStatus(400)
             return
         }
-        res.sendStatus(400)
+
+        const updatedUser = await this.userService.updateUserPassword(req.user.id, req.body.password)
+        if(updatedUser === null) {
+            res.status(404).json({ message: 'User update failed' })
+            return
+        }
+
+        res.json(true)
     }
 
+    /**
+     * update user role.
+     */
     async updateUserRole(req: Request, res: Response): Promise<void> {
-        const isAdmin = req.body.is_admin
-        const user = await redisRepository.get(`sessions:${req.session!.sessionId}:user`)
-
-        if(user !== null && typeof isAdmin === 'boolean') {
-            const updatedUser = this.userService.updateUserRole(user, isAdmin)
-            if(updatedUser === null) {
-                res.status(404).json({ message: 'User update failed' })
-                return
-            }
-
-            await this.sessionService.updateUserRole(user, isAdmin)
-            res.json(true)
+        if(req.body.user === undefined || req.body.is_admin === undefined) {
+            res.sendStatus(400)
             return
         }
-        res.sendStatus(400)
+
+        const updatedUser = this.userService.updateUserRole(req.body.user, req.body.is_admin)
+        if(updatedUser === null) {
+            res.status(404).json({ message: 'User update failed' })
+            return
+        }
+
+        await this.sessionService.updateUserRole(req.body.user, req.body.is_admin)
+        res.json(true)
     }
 
+    /**
+     * remove user and remove all sessions informations.
+     */
     async removeUser(req: Request, res: Response): Promise<void> {
-        const userId = req.params.id
-        const deletedUser = await this.userService.deleteUserById(userId)
+        if(req.params.id === undefined) {
+            res.sendStatus(400)
+            return
+        }
+        
+        const deletedUser = await this.userService.deleteUserById(req.params.id)
         
         if(deletedUser === null) {
             res.status(404).json({ message: 'User not found' })
             return 
         }
 
-        await this.sessionService.revokeAllUserSessions(userId)
+        await this.sessionService.revokeAllUserSessions(req.params.id)
         res.json(true)
-    }
-
-    async removeDeviceSession(req: Request, res: Response): Promise<void> {
-        const deviceId = req.params.deviceId
-        const user = await redisRepository.get(`sessions:${req.session!.sessionId}:user`)
-
-        if(user !== null && typeof deviceId === 'string') {
-            await this.sessionService.revokeDeviceSessionByDevice(user, deviceId)
-            res.json(true)
-            return
-        }
-        res.sendStatus(400)
     }
 }

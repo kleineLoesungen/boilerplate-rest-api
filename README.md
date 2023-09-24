@@ -1,4 +1,18 @@
 # Boilerplate for REST-API
+## Getting Started
+Clone repository
+
+Build app
+```terminal
+npm run build
+```
+
+Run infrastructure
+*in `run/compose.yaml` uncomment redis-commander from official docker hub. I had build own image for macOS/arm64*
+```terminal
+npm run start
+```
+
 ## Current App Features
 - [Modern modulare architecture](#modern-modulare-architecture)
 - [API with CRUD functions](#crud-functions-without-user-accounts)
@@ -21,6 +35,7 @@ all variables are required
 - `REDIS_HOST`
 - `REDIS_PASSWORD`
 - `SESSION_SECRET`
+- `JWT_SECRET`
 - `APP_ADMIN_USER` is used, if no admin exists
 - `APP_ADMIN_PASSWORD` is used, if no admin exists
 
@@ -61,6 +76,7 @@ in `/routes`, e.g.
 - Middleware in `middlewares/authMiddleware.ts` checks sessions values in caching 
 - Protected routes must implement **isLoggedIn** (only for users) or **isAdmin** (only for admins)
 - Database user table definition is in `/models/userModel.ts` and session values in `/models/sessionModel.ts`
+- All user routes/functions are in `/routes/v1/authRoutes.ts`
 
 ### Dockerfile
 - Multi-Stage image creation
@@ -69,7 +85,7 @@ in `/routes`, e.g.
 - Second stage: Shift only Javascript and install only production packages
 
 ## Next for Boilerplate
-- Support authentification for apps (API Tokens)
+- Logging and monitoring
 
 ## Next for Running Boilerplate
 ### Docker Compose
