@@ -33,7 +33,7 @@ function setInitialDatabaseAdmin() {
             if(users.filter(u => u.is_admin).length === 0) {
                 // create initial admin
                 const admin = userService.createUser({
-                    user: process.env.APP_ADMIN_USER!,
+                    id: process.env.APP_ADMIN_USER!,
                     password: process.env.APP_ADMIN_PASSWORD!,
                     is_admin: true
                 })
