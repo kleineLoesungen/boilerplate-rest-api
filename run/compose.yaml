@@ -6,12 +6,16 @@ services:
     networks:
       - backend
       - dbnet
+    depends_on:
+      - database
+      - redis
     environment:
       POSTGRES_HOST: database
       POSTGRES_USER: app
       POSTGRES_PASSWORD: boilerplate
       POSTGRES_DB: webnode
       SESSION_SECRET: s9gJbLo3uV
+      JWT_SECRET: s9gJbLo3uV
       REDIS_HOST: redis
       REDIS_PASSWORD: 123
       APP_ADMIN_USER: Sebastian
@@ -50,6 +54,7 @@ services:
       - dbnet
 
   redis-commander:
+  #  image: rediscommander/redis-commander:latest
     image: redis-commander
     environment:
       REDIS_HOSTS: web-node:redis:6379:0:123
