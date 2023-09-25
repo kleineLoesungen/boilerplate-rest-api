@@ -1,8 +1,19 @@
 services:
+  nginx:  
+    image: nginx-app
+    depends_on:  
+      - app
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+
   app:
     image: web-node
-    ports:
-      - 8080:3000
+    deploy:
+      replicas: 2
+    expose:
+      - "3000"
     networks:
       - backend
       - dbnet

@@ -7,7 +7,7 @@
     "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "docker compose -f run/compose.yaml up -d",
-    "build": "docker build . -t web-node"
+    "build": "docker build . -t web-node && docker build ./run/nginx -t nginx-app"
   },
   "repository": {
     "type": "git",
