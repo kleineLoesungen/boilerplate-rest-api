@@ -15,9 +15,6 @@ export class NodeController {
             .then((createdNode) => {
                 res.json(createdNode)
             })
-            .catch((err) => {
-                res.status(404).json({ message: `Error during Node creation: ${err}`})
-            });
     }
 
     getNode(req: Request, res: Response): void {
@@ -30,9 +27,6 @@ export class NodeController {
                 }
                 res.json(node)
             })
-            .catch((err) => {
-                res.status(404).json({ message: `Error during Node query: ${err}`})
-            });
     }
 
     getNodes(req: Request, res: Response): void {
@@ -40,9 +34,6 @@ export class NodeController {
             .then((nodes) => {
                 res.json(nodes)
             })
-            .catch((err) => {
-                res.status(404).json({ message: `Error during Nodes query: ${err}`})
-            });
     }
 
     updateNode(req: Request, res: Response): void {
@@ -60,9 +51,6 @@ export class NodeController {
                 }
                 res.json(updatedNode)
             })
-            .catch((err) => {
-                res.status(404).json({ message: `Error during Node update: ${err}`})
-            });
     }
 
     deleteNode(req: Request, res: Response): void {
@@ -74,8 +62,5 @@ export class NodeController {
                 }
                 res.json(true)
             })
-            .catch((err) => {
-                res.status(404).json({ message: `Error during Node deletion: ${err}`})
-            });
     }
 }

@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DB,
     synchronize: true,
-    logging: true,
+    logging: false,
     entities: ["./src/models/*.js"]
 })
 
@@ -19,9 +19,6 @@ AppDataSource.initialize()
         console.log("Data Source has been initialized!")
 
         setInitialDatabaseAdmin()
-    })
-    .catch((err) => {
-        console.error("Error during Data Source initialization", err)
     })
 
 function setInitialDatabaseAdmin() {
@@ -39,8 +36,5 @@ function setInitialDatabaseAdmin() {
                 })
                 if(admin === null) throw new Error('user id/name already exists')
             }
-        })
-        .catch((err) => {
-            console.error("Error during Admin creation", err)
         })
 }

@@ -36,5 +36,4 @@ routesAuth.get('/self/tokens', isLoggedIn, sessionTokenController.getSessionToke
 routesAuth.post('/self/tokens/:id/update/name', isLoggedIn, joiValidateParamsId, joiValidateBodyName, sessionTokenController.updateSessionToken.bind(sessionTokenController));
 routesAuth.delete('/self/tokens/:id/remove', isLoggedIn, joiValidateParamsId, sessionTokenController.removeSessionToken.bind(sessionTokenController));
 
-
 export { routesAuth };

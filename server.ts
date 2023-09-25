@@ -4,6 +4,8 @@ import bodyParser from 'body-parser'
 import { routesNode } from './src/routes/v1/nodeRoutes'
 import { routesAuth } from './src/routes/v1/authRoutes'
 import cookieSession from 'cookie-session'
+import { errorLogger, errorResponder, invalidPathHandler } from "./src/middlewares/errorMiddleware"
+import { routesError } from "./src/routes/v1/errorRoutes"
 
 const app = express();
 const PORT = 3000;
@@ -21,6 +23,12 @@ app.use(cookieSession({
 // Routes
 app.use('/api/v1/nodes', routesNode);
 app.use('/api/v1/auth', routesAuth);
+app.use('/api/v1/error', routesError);
+
+// Error handling
+app.use(errorLogger)
+app.use(errorResponder)
+app.use(invalidPathHandler)
 
 // Run
 app.listen(PORT, () => {

@@ -54,10 +54,7 @@ export class UserServiceImplementation implements UserService {
         newUser.id = user.id
         newUser.is_admin = user.is_admin
         newUser.passhash = passhash
-        await userRepository.save(newUser).catch((err) => {
-            console.log('Error during user creation', err)
-            return null
-        })
+        await userRepository.save(newUser)
         return user.id;
     }
 

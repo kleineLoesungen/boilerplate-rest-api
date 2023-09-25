@@ -37,10 +37,7 @@ export class SessionTokenServiceImplementation implements SessionTokenService {
 
         const sessionToken = jwt.sign({ id: newToken.id }, process.env.JWT_SECRET!)
 
-        await sessionTokenRepository.save(newToken).catch((err) => {
-            console.error('Error during user creation', err)
-            return null
-        })
+        await sessionTokenRepository.save(newToken)
         return { name: tokenName, token: sessionToken };
     }
 
@@ -66,7 +63,7 @@ export class SessionTokenServiceImplementation implements SessionTokenService {
         if(sessionToken === null) return false
 
         sessionToken.name = newName
-        await sessionTokenRepository.save(sessionToken).catch((err) => { return false })
+        await sessionTokenRepository.save(sessionToken)
         return true
     }
 
